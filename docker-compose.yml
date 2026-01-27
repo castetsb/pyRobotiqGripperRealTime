@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  gripper:
+    image: pyrobotiq-gripper-realtime:latest
+    container_name: gripper
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    ports:
+      - "502:502"
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
