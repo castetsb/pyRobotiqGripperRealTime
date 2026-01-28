@@ -10,8 +10,11 @@ https://github.com/UniversalRobots/Universal_Robots_ToolComm_Forwarder_URCap
 
 How to use it ?
 ===============
+
 1- Copy repository files in a folder on your PC.
+
 2- Open a terminal and navigate to this folder.
+
 3- Run docker command to build the docker image.
 
 .. code-block:: bash
