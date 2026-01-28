@@ -4,8 +4,7 @@ from pyModbusTCP.server import ModbusServer
 
 # parse args
 parser = argparse.ArgumentParser()
-parser.add_argument('-p', '--port', type=int, default=502, help='TCP port (default: 502)')
-parser.add_argument('-d', '--debug', action='store_true', help='set debug mode')
+parser.add_argument("-d", "--debug", action='store_true', help='set debug mode')
 args = parser.parse_args()
 
 
@@ -13,7 +12,7 @@ def run_server():
     print("Server running...")
 
     # init server
-    server = ModbusServer(host="0.0.0.0", port=args.port)
+    server = ModbusServer(host="0.0.0.0", port=502)
 
     # logging setup
     logging.basicConfig()

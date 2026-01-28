@@ -2,17 +2,30 @@ import time
 from pymodbus.client import ModbusTcpClient
 from gripperSerialControl import *
 import numpy as np
+import argparse
+# parse args
+parser = argparse.ArgumentParser()
+parser.add_argument('--method', type=str, default="RTU_VIA_TCP", help='Gripper communication method (default: RTU_VIA_TCP). RTU is also supported.')
+parser.add_argument('--gripper_id', type=int, default=9, help='Gripper device ID (default: 9)')
+parser.add_argument('--gripper_port', default='5020', help='TCP port or serial port of the gripper (default: 5020)')
+parser.add_argument('--gripper_IP', type=str, default='10.0.0.0', help='Gripper IP address (default: 10.0.0.0)')
+
+args = parser.parse_args()
 
 def run_monitor():
     print("Server monitoring running...")
     try:
-        client = ModbusTcpClient("127.0.0.1", port=502)
-        client.connect()
+        modbusTCPServer_client = ModbusTcpClient("127.0.0.1", port=502)
+        modbusTCPServer_client.connect()
+
+
 
 
 
         #Variables
-        gripper=Gripper()
+        gClient=gripperClient(method=args.method, port=args.gripper_port, IP=args.gripper_IP)
+        print("Gripper ID is : ", args.gripper_id)
+        gripper=Gripper(gClient,device_id=args.gripper_id)
         gripper.activate_gripper()
         gripper.writePSF(0,255,255)
         speedFactor=4
@@ -22,7 +35,7 @@ def run_monitor():
         previousTime = time.time()
 
         while True:
-            newPosRequest = client.read_holding_registers(address=0, count=1).registers[0]
+            newPosRequest = modbusTCPServer_client.read_holding_registers(address=0, count=1).registers[0]
 
             #Loop duration
             now =time.time()
@@ -83,7 +96,7 @@ def run_monitor():
     except KeyboardInterrupt:
         print("Server monitoring received Ctrl+C, shutting down...")
     finally:
-        client.close()  # ensure the client is always closed
+        modbusTCPServer_client.close()  # ensure the client is always closed
         print("Client connection closed.")
 
 if __name__ == "__main__":
