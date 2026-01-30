@@ -15,7 +15,8 @@ Requirements:
 - If the PC is running windows: install wsl (https://learn.microsoft.com/en-us/windows/wsl/install)
 - Install and run docker on the PC where you want to install the application (https://www.docker.com/get-started/)
 
-## Method A: Gripper connected at the wrist of the robot
+Method A: Gripper connected at the wrist of the robot
+============
 
 .. code-block:: text
 
