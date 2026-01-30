@@ -177,7 +177,8 @@ The thread, which is monitoring the position request, sends appropriate Modbus R
 
 The monitoring thread only forwards meaningful position requests. For example if the same position is requested at 500Hz the thread we send only 1 position request to the gripper. This prevent from overloading the gripper Modbus RTU communication which is not designed to handle high-frequency commands.
 
-## Go further
+Go further
+============
 
 It would be possible to integrate this control concept by making a URCAP which reads an RTDE register and send RTU command to the gripper connected at the wrist. RTDE is better suited for realtime control and RTU command are directly send to the gripper which would provide the smoothest communication.
 The only draw back would be that such URCAP would ptentially load the robot controller processor and slow dow execution.
