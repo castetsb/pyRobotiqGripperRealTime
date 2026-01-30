@@ -1,5 +1,5 @@
 # pyRobotiqGripperRealtime
-========================
+
 This python application is designed to control a Robotiq gripper(2F85, 2F140 or hand) by sending position command in Modbus TCP at high frequency.
 
 The gripper can be connected in two ways:
@@ -8,12 +8,12 @@ A- on the wrist of the UR robot (May be a bit laggy)
 B- on the PC on which is install the application (Fast). The gripper is mounted at the wrist of the robot and have its communication cable routed along the arm and connected to the PC. It is actually very similar to using the Robotiq Modbus TCP universal controller.
 
 ## Requirements:
-=============
+
 - If the PC is running windows: install wsl (https://learn.microsoft.com/en-us/windows/wsl/install)
 - Install and run docker on the PC where you want to install the application (https://www.docker.com/get-started/)
 
 ## Method A: Gripper connected at the wrist of the robot
-======================================================
+
 
 Modbus TCP client  (500 Hz)
         |Modbus TCP command
@@ -62,7 +62,7 @@ Here below is an example of python script to send a position request to the Modb
     client.write_register(address=0, value=position)
 
 ## Method B: Gripper connected to the PC serial port
-=================================================
+
 
 Modbus TCP client  (500 Hz)
         |Modbus TCP command
@@ -157,7 +157,7 @@ Here below is an example of python script to send a position request to the Modb
 
 
 ## The concept
-============
+
 The application consist of:
 - A Modbus TCP server which can recieve at high frequency position request (0-255) on its register 0
 - A thread that monitor the position request saved in register 0 of the Modbus server and send appropriate command (position,speed,force) to the gripper connected at the wrist of the robot.
@@ -171,7 +171,7 @@ The thread, which is monitoring the position request, sends appropriate Modbus R
 The monitoring thread only forwards meaningful position requests. For example if the same position is requested at 500Hz the thread we send only 1 position request to the gripper. This prevent from overloading the gripper Modbus RTU communication which is not designed to handle high-frequency commands.
 
 ## Go further
-============
+
 It would be possible to integrate this control concept by making a URCAP which reads an RTDE register and send RTU command to the gripper connected at the wrist. RTDE is better suited for realtime control and RTU command are directly send to the gripper which would provide the smoothest communication.
 The only draw back would be that such URCAP would ptentially load the robot controller processor and slow dow execution.
 
@@ -184,6 +184,6 @@ RTDE to Modbus URCAP (50 Hz)
 Gripper at robot wrist
 
 ## CAUTION
-=======
+
 This application is a kind of prototype. It would need to be tested to make sure it is stable. Use at your own risks.
 I hope the code of this application will help you to make your own realtime application.
