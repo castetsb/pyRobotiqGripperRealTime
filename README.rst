@@ -19,18 +19,18 @@ Requirements:
 
 .. code-block:: text
 
-Modbus TCP client  (500 Hz)
-        |Modbus TCP command
-        |Write gripper position request in register 0
-        v
-Modbus TCP Server (500+ Hz)
-        |Modbus RTU command (50hz)
-        |Over ethernet
-        v
-RS 485 URCAP (port 54321)
-        |Modbus RTU command
-        v
-Gripper at robot wrist
+    Modbus TCP client  (500 Hz)
+            |Modbus TCP command
+            |Write gripper position request in register 0
+            v
+    Modbus TCP Server (500+ Hz)
+            |Modbus RTU command (50hz)
+            |Over ethernet
+            v
+    RS 485 URCAP (port 54321)
+            |Modbus RTU command
+            v
+    Gripper at robot wrist
 
 1- Install the RS485 URCAP on the UR robot. See the following documentation for instruction on how to install it:
 https://github.com/UniversalRobots/Universal_Robots_ToolComm_Forwarder_URCap
@@ -70,15 +70,15 @@ Method B: Gripper connected to the PC serial port
 
 .. code-block:: text
 
-Modbus TCP client  (500 Hz)
-        |Modbus TCP command
-        |Write gripper position request in register 0
-        v
-Modbus TCP Server (500+ Hz)
-        |Modbus RTU command (50hz)
-        |Over PC serial
-        v
-Gripper at PC serial port
+    Modbus TCP client  (500 Hz)
+            |Modbus TCP command
+            |Write gripper position request in register 0
+            v
+    Modbus TCP Server (500+ Hz)
+            |Modbus RTU command (50hz)
+            |Over PC serial
+            v
+    Gripper at PC serial port
 
 1- Copy repository files in a folder on your PC.
 
@@ -184,13 +184,13 @@ The only draw back would be that such URCAP would ptentially load the robot cont
 
 .. code-block:: text
 
-RTDE client  (500 Hz)
-        |(ethernet)
-        v
-RTDE to Modbus URCAP (50 Hz)
-        |
-        v
-Gripper at robot wrist
+    RTDE client  (500 Hz)
+            |(ethernet)
+            v
+    RTDE to Modbus URCAP (50 Hz)
+            |
+            v
+    Gripper at robot wrist
 
 CAUTION
 ============
