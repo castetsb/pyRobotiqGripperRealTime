@@ -50,6 +50,7 @@ def run_monitor():
         while True:
             
             previousTime = now
+            speedFactor=4
 
             now =time.monotonic()
             #Loop duration
@@ -118,10 +119,9 @@ def run_monitor():
                         time.sleep(timeToPos(newCalculatedPos,newPosRequest,255))
                         
                     else:
-                        if abs(newPosDelta)>(10):
-                            newSpeedCommand=255
-                        else:
-                            newSpeedCommand=0
+                        newSpeedCommand= int(abs(newPosDelta*speedFactor))
+                        if newSpeedCommand>255:
+                            newSpeedCommand=int(255)
                         force=0
                         if (previousPosRequest != newPosRequest) and (previousSpeed != newSpeedCommand):
                             gripper.move(newPosRequest,newSpeedCommand,force)
