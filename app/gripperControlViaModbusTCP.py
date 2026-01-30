@@ -89,12 +89,9 @@ def run_monitor():
             newPosDelta = newPosRequest - newCalculatedPos
 
             #Calculate new speed command
-
-            newSpeedCommand= int(abs(newPosDelta*speedFactor))
-            if newSpeedCommand>255:
-                newSpeedCommand=int(255)
             
             force=0
+            newSpeedCommand=0
 
 
             if newCalculatedPos != newPosRequest:
@@ -119,14 +116,23 @@ def run_monitor():
                         gripper.waitComplete()
 
                     else:
-                        #print(f"Currently at {newCalculatedPos}, moving to {newPosRequest} at speed {newSpeedCommand}")
+                        
+                        newSpeedCommand= int(abs(newPosDelta*speedFactor))
+                        if newSpeedCommand>255:
+                            newSpeedCommand=int(255)
+                        #newSpeedCommand=int((newSpeedCommand//10)*10)
+                        
                         force=0
-                        start_rtu_com = time.monotonic()
-                        gripper.writePSF(newPosRequest,newSpeedCommand,force)
-                        end_rtu_com = time.monotonic()
-                        total_rtu_com_time = total_rtu_com_time + end_rtu_com -start_rtu_com
-                        nbr_rtu_com += 1
-                        average_rtu_com_time = total_rtu_com_time / nbr_rtu_com
+                        if (previousPosRequest != newPosRequest) or (previousSpeed != newSpeedCommand):
+                            start_rtu_com = time.monotonic()
+                            gripper.writePSF(newPosRequest,newSpeedCommand,force)
+                            end_rtu_com = time.monotonic()
+                            total_rtu_com_time = total_rtu_com_time + end_rtu_com -start_rtu_com
+                            nbr_rtu_com += 1
+                            average_rtu_com_time = total_rtu_com_time / nbr_rtu_com
+                            print(f"Currently at {newCalculatedPos}, moving to {newPosRequest} at speed {newSpeedCommand}")
+                        else:
+                            pass
 
                 else:
                     pass
