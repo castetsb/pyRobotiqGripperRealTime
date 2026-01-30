@@ -1,53 +1,51 @@
 import time
 from pymodbus.client import ModbusTcpClient
-from gripperSerialControl import *
 import numpy as np
 import argparse
+from robotiq_gripper import *
+
+GRIPPER_VMAX = 332  # max speed in steps per second
+GRIPPER_VMIN = 68   # min speed in steps per second
+GRIPPER_BAUDRATE = 115200
 
 #TCP_COM_TIME=0.0011
 #RTU_COM_TIME=0.0179
 
 # parse args
 parser = argparse.ArgumentParser()
-parser.add_argument('--method', type=str, default="RTU_VIA_TCP", help='Gripper communication method (default: RTU_VIA_TCP). RTU is also supported.')
-parser.add_argument('--gripper_id', type=int, default=9, help='Gripper device ID (default: 9)')
-parser.add_argument('--gripper_port', default='5020', help='TCP port or serial port of the gripper (default: 5020)')
-parser.add_argument('--gripper_IP', type=str, default='10.0.0.0', help='Gripper IP address (default: 10.0.0.0)')
-
+parser.add_argument('--robot_IP', type=str, default='10.0.0.0', help='IP of the robot on which is mounted the gripper')
 args = parser.parse_args()
 
+def timeToPos(startPos,endPos,speed):
+    
+    time=abs((endPos-startPos)/(GRIPPER_VMIN+(GRIPPER_VMAX-GRIPPER_VMIN)*speed/255))
+    return time
+
+
 def run_monitor():
-    print("Server monitoring running...")
+    print("Modbus TCP server monitoring running...")
     try:
         modbusTCPServer_client = ModbusTcpClient("127.0.0.1", port=502)
         modbusTCPServer_client.connect()
         
 
         #Variables
-        gClient=gripperClient(method=args.method, port=args.gripper_port, IP=args.gripper_IP)
-        #print("Gripper ID is : ", args.gripper_id)
-        gripper=Gripper(gClient,device_id=args.gripper_id)
-        gripper.activate_gripper()
-        gripper.writePSF(0,255,255)
+        print("Creating gripper...")
+        gripper = RobotiqGripper()
+        print("Connecting to gripper...")
+        gripper.connect(hostname = args.robot_IP, port = 63352)
+        print("Activating gripper...")
+        gripper.activate()
+
+        gripper.move(position = 0,speed = 255,force = 255)
+
         speedFactor=4
+
         previousCalculatedPos = 0
         previousPosRequest = 0
         previousSpeed = 0
         previousTime = time.monotonic()
         now =time.monotonic()
-
-        total_tcp_com_time = 0
-        nbr_tcp_com = 0
-        average_tcp_com_time = 0
-
-        total_rtu_com_time = 0
-        nbr_rtu_com = 0
-        average_rtu_com_time = 0
-
-
-
-
-
 
         while True:
             previousTime = now
@@ -55,14 +53,8 @@ def run_monitor():
             #Loop duration
             duration = now-previousTime
 
-            start_tcp_com = time.monotonic()
             newPosRequest = modbusTCPServer_client.read_holding_registers(address=0, count=1).registers[0]
-            end_tcp_com = time.monotonic()
-            total_tcp_com_time = total_tcp_com_time + end_tcp_com -start_tcp_com
-            nbr_tcp_com += 1
-            average_tcp_com_time = total_tcp_com_time / nbr_tcp_com
             
-
             #Calculate predicted position
             previousPosDelta = previousPosRequest - previousCalculatedPos
             
@@ -102,43 +94,32 @@ def run_monitor():
                 if newPosRequest <3 and previousPosRequest>=3:
                     print("Full open")
                     force=255
-                    gripper.writePSF(0,255,force)
-                    gripper.waitComplete()
+                    gripper.move(0,255,force)
+                    time.sleep(timeToPos(newCalculatedPos,0,255))
 
                 elif newPosRequest >228 and previousPosRequest<=228:
                     print("Full close")
                     force=255
-                    gripper.writePSF(255,255,force)
-                    gripper.waitComplete()
+                    gripper.move(255,255,force)
+                    time.sleep(timeToPos(newCalculatedPos,255,255))
 
                 elif newPosRequest >=3 and newPosRequest <=228:
                     if (previousCalculatedPos<3 or previousCalculatedPos>228):
                         print("Released from endstop",previousCalculatedPos)
                         force=255
-                        gripper.writePSF(newPosRequest,255,force)
-                        gripper.waitComplete()
+                        gripper.move(0,255,force)
+                        time.sleep(timeToPos(newCalculatedPos,newPosRequest,255))
 
                     else:
                         #print(f"Currently at {newCalculatedPos}, moving to {newPosRequest} at speed {newSpeedCommand}")
-                        force=0
-                        start_rtu_com = time.monotonic()
-                        gripper.writePSF(newPosRequest,newSpeedCommand,force)
-                        end_rtu_com = time.monotonic()
-                        total_rtu_com_time = total_rtu_com_time + end_rtu_com -start_rtu_com
-                        nbr_rtu_com += 1
-                        average_rtu_com_time = total_rtu_com_time / nbr_rtu_com
+                        
+                        gripper.move(newPosRequest,newSpeedCommand,force)
 
                 else:
                     pass
             else:
                 pass
 
-            #print("send wait")
-            #print(f"continue_sleep : {abs(continue_sleep_time):.4f}  send sleep : {abs(send_command_sleep_time):.4f}")
-            #print(f"----{duration}----")
-            #print(f"resquest {previousPosRequest} , calc pos {previousCalculatedPos} , speed {previousSpeed:.4f} ")
-            #print(f"resquest {newPosRequest} , calc pos {newCalculatedPos} , speed {newSpeedCommand:.4f} ")
-            #print(f"tcp time {average_tcp_com_time:.4f}, rtu time {average_rtu_com_time:.4f}")
             previousCalculatedPos = newCalculatedPos
             previousPosRequest = newPosRequest
             previousSpeed = newSpeedCommand
@@ -147,6 +128,7 @@ def run_monitor():
     except KeyboardInterrupt:
         print("Server monitoring received Ctrl+C, shutting down...")
     finally:
+        gripper.disconnect()
         modbusTCPServer_client.close()  # ensure the client is always closed
         print("Client connection closed.")
 

@@ -1,4 +1,11 @@
-FROM python:3.14.2
+FROM python:3.11-slim
+
+# Install build tools and CMake
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -20,8 +27,5 @@ ENTRYPOINT [ "python", "./main.py" ]
 #docker run --rm -t modbus-tcp-server:latest --help
 
 
-#Docker command to run with a device connected on docker PC serial
-#docker run --rm -t --device=/dev/ttyUSB0:/dev/ttyUSB0 -p 502:502 modbus-tcp-server:latest --method "RTU" --gripper_id 9 --gripper_port "/dev/ttyUSB0"
-
-#Docker command to run with a device on a UR robot wrist with toolcomm URCAP tunnelling serial to ethernet (change IP for robot IP)
-#docker run --rm -t -p 502:502 modbus-tcp-server:latest --method "RTU_VIA_TCP" --gripper_port 54321 --gripper_IP 10.0.0.80
+#Docker command to run the docker
+#docker run --rm -t -p 502:502 modbus-tcp-server:latest --robot_IP 10.0.0.80
