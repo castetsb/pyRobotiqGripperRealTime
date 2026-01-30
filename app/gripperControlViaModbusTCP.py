@@ -37,9 +37,9 @@ def run_monitor():
         print("Activating gripper...")
         gripper.activate()
 
-        gripper.move(position = 0,speed = 255,force = 255)
+        gripper.move(position = 0,speed = 0,force = 0)
 
-        speedFactor=4
+        #speedFactor=4
 
         previousCalculatedPos = 0
         previousPosRequest = 0
@@ -48,7 +48,9 @@ def run_monitor():
         now =time.monotonic()
 
         while True:
+            
             previousTime = now
+
             now =time.monotonic()
             #Loop duration
             duration = now-previousTime
@@ -82,10 +84,11 @@ def run_monitor():
 
             #Calculate new speed command
 
-            newSpeedCommand= int(abs(newPosDelta*speedFactor))
-            if newSpeedCommand>255:
-                newSpeedCommand=int(255)
+            #newSpeedCommand= int(abs(newPosDelta*speedFactor))
+            #if newSpeedCommand>255:
+            #    newSpeedCommand=int(255)
             
+            newSpeedCommand=0
             force=0
 
 
@@ -94,30 +97,42 @@ def run_monitor():
                 if newPosRequest <3 and previousPosRequest>=3:
                     print("Full open")
                     force=255
-                    gripper.move(0,255,force)
+                    newSpeedCommand=255
+                    gripper.move(0,newSpeedCommand,force)
                     time.sleep(timeToPos(newCalculatedPos,0,255))
 
                 elif newPosRequest >228 and previousPosRequest<=228:
                     print("Full close")
                     force=255
-                    gripper.move(255,255,force)
+                    newSpeedCommand=255
+                    gripper.move(255,newSpeedCommand,force)
+                    
                     time.sleep(timeToPos(newCalculatedPos,255,255))
 
                 elif newPosRequest >=3 and newPosRequest <=228:
                     if (previousCalculatedPos<3 or previousCalculatedPos>228):
                         print("Released from endstop",previousCalculatedPos)
                         force=255
-                        gripper.move(0,255,force)
+                        newSpeedCommand=255
+                        gripper.move(0,newSpeedCommand,force)
                         time.sleep(timeToPos(newCalculatedPos,newPosRequest,255))
-
-                    else:
-                        #print(f"Currently at {newCalculatedPos}, moving to {newPosRequest} at speed {newSpeedCommand}")
                         
-                        gripper.move(newPosRequest,newSpeedCommand,force)
-
+                    else:
+                        if abs(newPosDelta)>(10):
+                            newSpeedCommand=255
+                        else:
+                            newSpeedCommand=0
+                        force=0
+                        if (previousPosRequest != newPosRequest) and (previousSpeed != newSpeedCommand):
+                            gripper.move(newPosRequest,newSpeedCommand,force)
+                            print(f"Current pos {newCalculatedPos}:.0f Moving to {newPosRequest}:.0f at speed {newSpeedCommand}:.0f")
+                        else:
+                            print("pass")
                 else:
+                    print("pass")
                     pass
             else:
+                print("pass")
                 pass
 
             previousCalculatedPos = newCalculatedPos
