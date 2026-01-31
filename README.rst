@@ -168,10 +168,14 @@ Graphic interface to send pos command to TCP server for testing
 If you add the option --hmi to the docker command it will run a graphic interface to send position command to the TCP server for testing. You can connect to this interface using a vnc client like realvnc (https://www.realvnc.com/en/connect/download/viewer/).
 Connect to: localhost:5900
 
-.. image:: modbusTCPgui.jpg
+It runs a bit slow.
+
+.. image:: modbusTCPgui.JPG
    :alt: Image of the graphic interface
    :width: 600px
    :align: center
+
+You can also run the 
 
 The concept
 ============
