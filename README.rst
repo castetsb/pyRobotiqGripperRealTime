@@ -172,7 +172,7 @@ It runs a bit slow.
 
 .. image:: modbusTCPgui.JPG
    :alt: Image of the graphic interface
-   :width: 600px
+   :width: 100%
    :align: center
 
 You can also run the 
