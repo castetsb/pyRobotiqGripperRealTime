@@ -1,27 +1,40 @@
 FROM python:3.14.2
 
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DISPLAY=:1
+
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y \
+    libgl1 \
+    libglib2.0-0 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxrender1 \
+    libxi6 \
+    libxext6 \
+    libxfixes3 \
+    libxrandr2 \
+    libxcursor1 \
+    libsm6 \
+    libfontconfig1 \
+    libxcomposite1 \
+    libxdamage1 \
+    python3-pyqt5 \
+    xvfb \
+    x11vnc \
+    fluxbox \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY ./requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 COPY ./app /app
+COPY ./entrypoint.sh /app/entrypoint.sh
+
+RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 502/tcp
+EXPOSE 5900
 
-ENTRYPOINT [ "python", "./main.py" ]
-#CMD [ "--host", "0.0.0.0", "--port", "502" ]
-
-#Docker command to build the image
-#docker build -t modbus-tcp-server:latest .
-
-#Docker command to get help
-#docker run --rm -t modbus-tcp-server:latest --help
-
-
-#Docker command to run with a device connected on docker PC serial
-#docker run --rm -t --device=/dev/ttyUSB0:/dev/ttyUSB0 -p 502:502 modbus-tcp-server:latest --method "RTU" --gripper_id 9 --gripper_port "/dev/ttyUSB0"
-
-#Docker command to run with a device on a UR robot wrist with toolcomm URCAP tunnelling serial to ethernet (change IP for robot IP)
-#docker run --rm -t -p 502:502 modbus-tcp-server:latest --method "RTU_VIA_TCP" --gripper_port 54321 --gripper_IP 10.0.0.80
+ENTRYPOINT ["/app/entrypoint.sh"]
