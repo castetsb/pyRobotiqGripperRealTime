@@ -175,7 +175,36 @@ It runs a bit slow.
    :width: 100%
    :align: center
 
-You can also run the 
+You can run this interface faster by running it directly on your PC in a python virtual environment.
+The following instructions works for Windows it would be similar commadns for Linux.
+
+1- Install python3 on your PC: https://www.python.org/downloads/
+
+2- Open the terminal and navigate to the "app" folder where is the "realtimeInterfaceTCP.py" file.
+
+3- Create a virtual environment (Note that depending on the installation the way to call python3 may be different)
+
+.. code-block:: bash
+
+    python3 -m venv venv
+
+4- Activate the environment
+
+.. code-block:: bash
+
+    .\venv\Script\activate.bat
+
+5- Install depencies
+
+.. code-block:: bash
+
+    python3 -m pip install numpy pyqt5 scipy pymodbus
+
+6- Run "realtimeInterfaceTCP.py"
+
+.. code-block:: bash
+
+    python3 realtimeInterfaceTCP.py
 
 The concept
 ============
@@ -222,12 +251,6 @@ There is a fork for this approach: https://github.com/castetsb/pyRobotiqGripperR
             |RTU command
             v
     Gripper at robot wrist
-
-
-
-
-
-
 
 CAUTION
 ============
