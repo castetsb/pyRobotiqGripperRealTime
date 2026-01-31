@@ -367,6 +367,7 @@ timer.start(1)  # Refresh rate in milliseconds (500Hz)
 mainWindow.show()
 mainWindow.raise_()
 mainWindow.activateWindow()
+mainWindow.showMaximized()
 #mainWindow.showFullScreen()
 
 # Start the application event loop
