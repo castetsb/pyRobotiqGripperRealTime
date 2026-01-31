@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(description='Launch Modbus TCP server and gripp
 
 # Server-specific arguments
 parser.add_argument("-d", "--debug", action='store_true', help='set debug mode')
-parser.add_argument("--hmi", action='store_true', help='set debug mode')
+parser.add_argument("--hmi", action='store_true', help='Generate a graphic interface to send psotion commadn to the TCP server. Use a VNC client and connect to localhost:5900 to see it.')
 
 # Monitor-specific arguments
 

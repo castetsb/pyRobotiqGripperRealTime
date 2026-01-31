@@ -162,6 +162,16 @@ Here below is an example of python script to send a position request to the Modb
     client.connect()
     client.write_register(address=0, value=position)
 
+Graphic interface to send pos command to TCP server for testing
+============
+
+If you add the option --hmi to the docker command it will run a graphic interface to send position command to the TCP server for testing. You can connect to this interface using a vnc client like realvnc (https://www.realvnc.com/en/connect/download/viewer/).
+Connect to: localhost:5900
+
+.. image:: modbusTCPgui.jpg
+   :alt: Image of the graphic interface
+   :width: 600px
+   :align: center
 
 The concept
 ============
@@ -187,12 +197,33 @@ The only draw back would be that such URCAP would ptentially load the robot cont
 .. code-block:: text
 
     RTDE client  (500 Hz)
-            |(ethernet)
+            |RTDE command
+            |Over ethernet
             v
     RTDE to Modbus URCAP (50 Hz)
-            |
+            |RTU commmad
             v
     Gripper at robot wrist
+
+It would be also possible to communicate with the gripper connected at the wrist throught the Robotiq URCAP.
+There is a fork for this approach: https://github.com/castetsb/pyRobotiqGripperRealTime/tree/ur_rtde_version
+
+.. code-block:: text
+
+    Modbus TCP client  (500 Hz)
+            |Robotiq URCAP server command
+            |Over ethernet
+            v
+    Robotiq URCAP (50 Hz)
+            |RTU command
+            v
+    Gripper at robot wrist
+
+
+
+
+
+
 
 CAUTION
 ============
