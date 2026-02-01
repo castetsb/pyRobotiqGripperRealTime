@@ -6,8 +6,7 @@ rtuFramer=FramerType.RTU
 import logging
 import time
 
-GRIPPER_VMAX = 332  # max speed in steps per second
-GRIPPER_VMIN = 68   # min speed in steps per second
+
 GRIPPER_BAUDRATE = 115200
 """
 logging.basicConfig(
@@ -111,6 +110,14 @@ class Gripper():
             gOBJ=(gripperStatusReg0 >> 6) & 0b11
         duration=time.time()-startTime
         print(f"Wait complete duration: {duration} seconds, gOBJ={gOBJ}")
+    def estimateAndWaitComplete(self,currentPos,requestedPos,speed):
+        GRIPPER_VMAX = 332  # max speed in steps per second
+        GRIPPER_VMIN = 68   # min speed in steps per second
+        posBitPerSecond = GRIPPER_VMIN + ((GRIPPER_VMAX-GRIPPER_VMIN)/255)*speed
+        timeToRequestedPos = abs(requestedPos-currentPos)/posBitPerSecond
+        time.sleep(timeToRequestedPos)
+
+
 
     def currentPos(self):
         result=self.client.read_input_registers(2002,count=1,device_id=self.device_id)

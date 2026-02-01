@@ -198,6 +198,8 @@ def updateData(data, value):
 
 # Real-time data generation
 def loop():
+    GRIPPER_VMAX = 332  # max speed in steps per second
+    GRIPPER_VMIN = 68   # min speed in steps per second
     global maxComTime
     global minComTime
     global timedData
