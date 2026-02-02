@@ -5,9 +5,6 @@ import numpy as np
 import argparse
 from commandFilter import commandFilter
 
-#TCP_COM_TIME=0.0011
-#RTU_COM_TIME=0.0179
-
 # parse args
 parser = argparse.ArgumentParser()
 parser.add_argument('--method', type=str, default="RTU_VIA_TCP", help='Gripper communication method (default: RTU_VIA_TCP). RTU is also supported.')
@@ -21,25 +18,27 @@ def run_monitor():
     print("Server monitoring running...")
     try:
         #Connect to modbus TCP server
+        print("Gripper driver connecting to TCP server")
         modbusTCPServer_client = ModbusTcpClient("127.0.0.1", port=502)
         modbusTCPServer_client.connect()
         
-
         #Connect to the gripper, activate it and open it
         gClient=gripperClient(method=args.method, port=args.gripper_port, IP=args.gripper_IP)
+
         gripper=Gripper(gClient,device_id=args.gripper_id)
+        print("Gripper Activation")
         gripper.activate_gripper()
+        print("Gripper performing a full open")
         gripper.writePSF(0,0,0)
         gripper.estimateAndWaitComplete(255,0,0)
 
-        #Initialize variables
+        maxFrequency = 0
+        
         previousRequestTime = time.monotonic()
         previousPosRequest = 0
         previousPos = 0
         previousSpeed = 0
         previousForce = 0
-
-        maxFrequency = 0
         
         while True:
             #1- Get new positon command
@@ -47,19 +46,16 @@ def run_monitor():
 
             #2- Get time
             now=time.monotonic()
-            elapsedTime = now - previousRequestTime
-
+            
             #2 Build gripper command
             command = commandFilter(newPosRequest,now,previousRequestTime,previousPos,previousPosRequest,previousSpeed,previousForce,5,110)
             if command["toExecute"]:
-                frequency = 1/elapsedTime
-                if frequency > maxFrequency:
-                    maxFrequency = frequency
 
-                print(f"maxComFrequency{maxFrequency:.0f} ,Previous P_request {previousPosRequest:.0f}, P{previousPos:.0f} , S {previousSpeed:.0f}, F{previousForce:.0f}, New P_request {command['positionRequest']:.0f}, P{command['currentPosition']:.0f}, S {command['speedRequest']:.0f}, F{command['forceRequest']:.0f}")
-                previousRequestTime = time.monotonic()
+                print(f"maPrevious P_request {previousPosRequest:.0f}, P{previousPos:.0f} , S {previousSpeed:.0f}, F{previousForce:.0f}, New P_request {command['positionRequest']:.0f}, P{command['currentPosition']:.0f}, S {command['speedRequest']:.0f}, F{command['forceRequest']:.0f}")
             else:
                 pass
+            
+            previousRequestTime = now
             previousPosRequest = command["positionRequest"]
             previousPos = command["currentPosition"]
             previousSpeed = command["speedRequest"]
@@ -69,7 +65,6 @@ def run_monitor():
                 gripper.writePSF(command["positionRequest"],command["speedRequest"],command["forceRequest"])
                 if command["waitUntilComplete"]:
                     gripper.estimateAndWaitComplete(command["currentPosition"],command["positionRequest"],command["speedRequest"])
-            
             time.sleep(0.001)
             
     except KeyboardInterrupt:
