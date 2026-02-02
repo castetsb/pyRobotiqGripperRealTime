@@ -221,6 +221,8 @@ The thread, which is monitoring the position request, sends appropriate Modbus R
 
 The monitoring thread only forwards meaningful position requests. For example if the same position is requested at 500Hz the thread we send only 1 position request to the gripper. This prevent from overloading the gripper Modbus RTU communication which is not designed to handle high-frequency commands.
 
+The gripper position request are processed by commandFilter.py. This script decide if the position have to be send to the gripper. It also set speed and force depending on the context.
+
 Go further
 ============
 
