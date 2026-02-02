@@ -1,19 +1,10 @@
-from socket import timeout
 from pymodbus.client import ModbusSerialClient
 from pymodbus.client import ModbusTcpClient
 from pymodbus.framer import FramerType
 rtuFramer=FramerType.RTU
-import logging
 import time
 
-
 GRIPPER_BAUDRATE = 115200
-"""
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s %(levelname)s %(name)s: %(message)s"
-)
-"""
 GRIPPER_MODE_RTU_VIA_TCP = "RTU_VIA_TCP"
 GRIPPER_MODE_RTU = "RTU"
 

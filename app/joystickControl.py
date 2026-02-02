@@ -4,7 +4,6 @@ from  gripperSerialControl import *
 from commandFilter import *
 import argparse
 import robotiq_gripper
-import sys
 
 # parse args
 parser = argparse.ArgumentParser()

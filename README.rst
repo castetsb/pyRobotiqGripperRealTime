@@ -198,7 +198,7 @@ The following instructions works for Windows it would be similar commadns for Li
 
 .. code-block:: bash
 
-    python3 -m pip install numpy pyqt5 scipy pymodbus
+    python3 -m pip install numpy pyqt5 scipy pymodbus pyqtgraph pyserial pygame
 
 6- Run "realtimeInterfaceTCP.py"
 
@@ -244,6 +244,10 @@ There is a fork for this approach: https://github.com/castetsb/pyRobotiqGripperR
 .. code-block:: text
 
     Modbus TCP client  (500 Hz)
+            |Modbus TCP command
+            |Write gripper position request in register 0
+            v
+    Modbus TCP Server (500+ Hz)
             |Robotiq URCAP server command
             |Over ethernet
             v
@@ -251,6 +255,109 @@ There is a fork for this approach: https://github.com/castetsb/pyRobotiqGripperR
             |RTU command
             v
     Gripper at robot wrist
+
+Joystick control
+============
+A script is available to try 3 different gripper control method using a joystick.
+The following instructions works for Windows it would be similar commadns for Linux.
+
+1- Install python3 on your PC: https://www.python.org/downloads/
+
+2- Open the terminal and navigate to the "app" folder where is the "joystickControl.py" file.
+
+3- (If you already created a virtual environment go to step 4) Create a virtual environment (Note that depending on the installation the way to call python3 may be different)
+
+.. code-block:: bash
+
+    python3 -m venv venv
+
+4- Activate the environment
+
+.. code-block:: bash
+
+    .\venv\Script\activate.bat
+
+5- Install depencies
+
+.. code-block:: bash
+
+    python3 -m pip install numpy pyqt5 scipy pymodbus pyqtgraph pyserial pygame
+
+6- Run "joystickControl.py"
+
+Example for "RTU" method:
+
+.. code-block:: bash
+
+    python3 joystickControl.py --gripper_port "COM8" --method "RTU"
+
+Example for "RTU_VIA_TCP" method:
+
+.. code-block:: bash
+
+    python3 joystickControl.py --gripper_port 54321 --robot_ip 10.0.0.80 --method "RTU_VIA_TCP"
+
+Example for "ROBOTIQ_URCAP" method:
+
+.. code-block:: bash
+
+    python3 joystickControl.py --gripper_port 63352 --robot_ip 10.0.0.80 --method "RTU_VIA_TCP"
+
+"RTU" 
+------------
+The gripper is directly connected to a serial port of the PC.
+
+.. code-block:: text
+
+    Joystick (500 Hz)
+            |[-1 1] analog signal
+            v
+    Python script (500 Hz)
+            |Modbus RTU commands (50 Hz)
+            |Over Serial Port
+            v
+    Gripper connected to PC serial
+
+"RTU_VIA_TCP"
+------------
+The gripper is connected at the wrist of the robot. It is controlled with RTU command send over ethernet to RS485 URCAP at port 54321.
+
+.. code-block:: text
+    Joystick  (500 Hz)
+            |[-1 1] analog signal
+            v
+    Python script (500 Hz)
+            |Modbus RTU commands (50 Hz)
+            |Over Ethernet
+            v
+    RS485 URCAP (500 Hz)
+            |Modbus RTU commands (50 Hz)
+            |Over Serial
+            v
+    Gripper connected at the wirst of the robot
+
+
+"ROBOTIQ_URCAP"
+------------
+The gripper is connected at the wrist of the robot. It is controller with variable SET command send over ethernet to RObotiq URCAP at port 63352. 
+
+.. code-block:: text
+
+    Joystick  (500 Hz)
+            |[-1 1] analog signal
+            v
+    Python script (500 Hz)
+            |SET commands (50 Hz)
+            |Over Ethernet
+            v
+    Robotiq URCAP (50 Hz)
+            |Modbus RTU commands (50 Hz)
+            |Over Serial
+            v
+    Gripper connected at the wirst of the robot
+
+
+
 
 CAUTION
 ============
