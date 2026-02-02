@@ -60,7 +60,7 @@ def commandFilter(newPosRequest,newPosRequestTime,previousRequestTime,previousPo
     newSpeed = 0
     newForce = 0
 
-    if newPos != newPosRequest:
+    if abs(newPos - newPosRequest)>2:
         #The gripper is not at the requested position
         if newPosRequest <3 and previousPosRequest>=3:
             #Fully open request

@@ -21,9 +21,9 @@ args = parser.parse_args()
 
 def map_0_255(x):
     """
-    Map a value from [-1, 1] to [2, 255].
+    Map a value from [-1, 1] to [0, 255].
     """
-    return int((x + 1) * (228-2)/(1-(-1))+2)
+    return int((x + 1) * (255-0)/(1-(-1))+0)
 
 def run_joystickControl():
     try:
@@ -52,6 +52,9 @@ def run_joystickControl():
         previousPos = 0
         previousSpeed = 0
         previousForce = 0
+        elapsedTime = 0
+        frequency = 0
+        minFrequency = 1000
         
         
         while True:
@@ -63,12 +66,20 @@ def run_joystickControl():
 
             #2- Get time
             now=time.monotonic()
+            elapsedTime = now - previousRequestTime
+            if elapsedTime>0:
+                frequency = 1/elapsedTime
+            else:
+                frequency =1000
+            if frequency < minFrequency:
+                minFrequency = frequency
+
             
             #2 Build gripper command
             command = commandFilter(newPosRequest,now,previousRequestTime,previousPos,previousPosRequest,previousSpeed,previousForce,5,110)
             if command["toExecute"]:
 
-                print(f"Previous: P_request {previousPosRequest:.0f}, P{previousPos:.0f} , S {previousSpeed:.0f}, F{previousForce:.0f} >> New: P_request {command['positionRequest']:.0f}, P{command['currentPosition']:.0f}, S {command['speedRequest']:.0f}, F{command['forceRequest']:.0f}")
+                print(f"Current,Min  frequency: {frequency:.0f}, {minFrequency:.0f} Previous: P_request {previousPosRequest:.0f}, P{previousPos:.0f} , S {previousSpeed:.0f}, F{previousForce:.0f} >> New: P_request {command['positionRequest']:.0f}, P{command['currentPosition']:.0f}, S {command['speedRequest']:.0f}, F{command['forceRequest']:.0f}")
             else:
                 pass
             
@@ -85,8 +96,9 @@ def run_joystickControl():
                     gripper.writePSF(command["positionRequest"],command["speedRequest"],command["forceRequest"])
                 
                 if command["waitUntilComplete"]:
-                    gripper.estimateAndWaitComplete(command["currentPosition"],command["positionRequest"],command["speedRequest"])
-            time.sleep(0.001)
+                    gripper.estimateAndWaitComplete(command["currentPosition"],command["positionRequest"],command["speedRequest"])                
+
+            #time.sleep(0.001)
 
     except KeyboardInterrupt:
         print("Stopping")
