@@ -4,6 +4,7 @@ from  gripperSerialControl import *
 from commandFilter import *
 import argparse
 import robotiq_gripper
+import sys
 
 # parse args
 parser = argparse.ArgumentParser()
@@ -46,14 +47,6 @@ def run_joystickControl():
             gripper = robotiq_gripper.RobotiqGripper()
             gripper.connect(args.robot_ip, gripper_port)
             gripper.activate()
-
-
-
-
-        
-        
-        
-        
         
         previousRequestTime = time.monotonic()
         previousPosRequest = 0
@@ -76,7 +69,7 @@ def run_joystickControl():
             command = commandFilter(newPosRequest,now,previousRequestTime,previousPos,previousPosRequest,previousSpeed,previousForce,5,110)
             if command["toExecute"]:
 
-                print(f"maPrevious P_request {previousPosRequest:.0f}, P{previousPos:.0f} , S {previousSpeed:.0f}, F{previousForce:.0f}, New P_request {command['positionRequest']:.0f}, P{command['currentPosition']:.0f}, S {command['speedRequest']:.0f}, F{command['forceRequest']:.0f}")
+                print(f"Previous: P_request {previousPosRequest:.0f}, P{previousPos:.0f} , S {previousSpeed:.0f}, F{previousForce:.0f} >> New: P_request {command['positionRequest']:.0f}, P{command['currentPosition']:.0f}, S {command['speedRequest']:.0f}, F{command['forceRequest']:.0f}")
             else:
                 pass
             
@@ -104,4 +97,4 @@ def run_joystickControl():
 
 # Start the application event loop
 if __name__ == '__main__':
-    sys.exit(app.exec_())
+    run_joystickControl()
